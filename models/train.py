@@ -37,11 +37,14 @@ train_data, val_data, test_data = data.TabularDataset.splits(path=path,
 															 train="train.csv", validation="validate.csv",
 															 test="test.csv", format="csv", fields=[("src", SRC),
 																									("tgt", TGT)])
-SRC.vocab = get_vocab()
-TGT.vocab = get_vocab()
+SRC.build_vocab(train_data, val_data)
+TGT.build_vocab(train_data, val_data)
+print(len(SRC.vocab))
+# SRC.vocab = get_vocab()
+# TGT.vocab = get_vocab()
 
 BATCH_SIZE = 64
-device = "cuda"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
 	(train_data, val_data, test_data),
@@ -51,33 +54,44 @@ train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
 )
 
 model = transformer.Transformer(num_tokens_inp=len(SRC.vocab), num_tokens_out=len(TGT.vocab), dim_model=200, num_heads=8,
-								num_encoder_layers=6, num_decoder_layers=6, max_len=13, dropout_p=0.1).to(device)
+								num_encoder_layers=6, num_decoder_layers=6, max_len=62, dropout_p=0.1).to(device)
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 loss_fn = nn.CrossEntropyLoss()
 
 
 def train(model, opt, loss_fn, dataloader):
 	model.train()
-	epoch_loss = 0
+	total_loss = 0
 
-	for i, batch in tqdm(enumerate(dataloader)):
-		src = batch.src
-		tgt = batch.tgt
+	for batch in tqdm(dataloader):
+		X = batch.src.T
+		y = batch.tgt.T
+
+		y_input = y[:, :-1]
+		y_expected = y[:, 1:]
+
+		sequence_length = y_input.size(1)
+		tgt_mask = model.get_tgt_mask(sequence_length).to(device)
+
+		pred = model(X, y_input, tgt_mask)
+
+		pred = pred.permute(1, 2, 0)
+		loss = loss_fn(pred, y_expected)
 
 		opt.zero_grad()
-		output = model(src, tgt)
-
-		print(output)
-
-		loss = loss_fn(output, tgt)
 		loss.backward()
-
 		opt.step()
-		epoch_loss += loss.item()
 
-	return epoch_loss/len(dataloader)
+		# print(output)
 
-# train_loss = train(model, optimizer, loss_fn, train_dataloader)
-# print(train_loss)
+		total_loss += loss.detach().item()
 
-print(torch.cuda.is_available())
+	return total_loss/len(dataloader)
+
+train_loss = train(model, optimizer, loss_fn, train_dataloader)
+print(train_loss)
+
+# for i in train_dataloader:
+# 	print(i)
+
+# print(torch.cuda.is_available())
