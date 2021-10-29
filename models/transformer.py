@@ -30,8 +30,7 @@ class Transformer(nn.Module):
 			nhead=num_heads,
 			num_encoder_layers=num_encoder_layers,
 			num_decoder_layers=num_decoder_layers,
-			dropout=dropout_p,
-			batch_first=True
+			dropout=dropout_p
 		)
 
 		self.out = nn.Linear(dim_model, num_tokens_out)
@@ -43,6 +42,9 @@ class Transformer(nn.Module):
 
 		src = self.positional_encoder(src)
 		tgt = self.positional_encoder(tgt)
+
+		src = src.permute(1, 0, 2)
+		tgt = tgt.permute(1, 0, 2)
 
 		transformer_out = self.transformer(src, tgt, tgt_mask=tgt_mask, src_key_padding_mask=src_pad_mask, tgt_key_padding_mask=tgt_pad_mask)
 		out = self.out(transformer_out)
@@ -79,5 +81,5 @@ class PositionalEncoding(nn.Module):
 		self.register_buffer("pos_encoding", pos_encoding)
 
 	def forward(self, token_embedding):
-		return self.dropout(self.pos_embedding[:token_embedding.size(0), :] + token_embedding)
+		return self.dropout(self.pos_encoding[:token_embedding.size(0), :] + token_embedding)
 
