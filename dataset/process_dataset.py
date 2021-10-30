@@ -8,6 +8,9 @@ from sklearn.model_selection import train_test_split
 # PGN Standard: http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.2
 
 def clean_kaggle(read_path, write_path):
+
+	# if starting no is not 1, remove game
+
 	# pgn data from kaggle has different notation
 	# only retain move info
 	print("reading games...")
@@ -16,9 +19,10 @@ def clean_kaggle(read_path, write_path):
 
 	print("cleaning games...")
 	moves = []
-	for game in games:
-		move = re.split(" |\.", game)
-		moves.append(" ".join(move[1::2]))
+	for game in tqdm(games):
+		if game[1] == '1':
+			move = re.split(" |\.", game)
+			moves.append(" ".join(move[1::2]))
 
 	print("cleaned games")
 
@@ -78,7 +82,13 @@ def get_tokens(path):
 			if len(chars) == 2:
 				move += ''.join(chars) + " "
 			elif chars[0] == "O":
-				move += ''.join(chars) + " "
+				if len(chars) == 3 or len(chars) == 5:
+					move += ''.join(chars) + " "
+				else:
+					if len(chars) == 4:
+						move += "O-O " + chars[3] + " "
+					else:
+						move += "O-O-O " + chars[5] + " "
 			else:
 				j = 0
 				while j < len(chars):

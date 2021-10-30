@@ -40,6 +40,7 @@ train_data, val_data, test_data = data.TabularDataset.splits(path=path,
 SRC.build_vocab(train_data, val_data)
 TGT.build_vocab(train_data, val_data)
 print(len(SRC.vocab))
+print(SRC.vocab.itos[:len(SRC.vocab)])
 # SRC.vocab = get_vocab()
 # TGT.vocab = get_vocab()
 
