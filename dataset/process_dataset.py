@@ -2,6 +2,9 @@ import os
 import re
 from tqdm import tqdm
 import time
+import pickle
+from langdetect import detect
+
 from sklearn.model_selection import train_test_split
 
 
@@ -168,3 +171,46 @@ def make_datasets_nmoves(read_path, write_path, start, end):
 			f.write(f"{validate_src[i]},{validate_tgt[i]}\n")
 
 	print(f"Finished in {time.time()-t1}")
+
+def make_commentary_dataset(input_file, output_folder):
+	data = []
+	not_en = 0
+
+	print("reading file...")
+	with open(f"{input_file}", "rb") as f:
+		commentary = pickle.load(f)
+		print(len(commentary))
+
+		print("cleaning data...")
+
+		for i in tqdm(range(len(commentary))):
+			src = commentary[i][0]
+			tgt = commentary[i][1]
+			src = src.replace(u'\xa0', u' ')
+			tgt = tgt.replace(u'\xa0', u' ')
+
+			try:
+				if detect(tgt) != "en":
+					not_en += 1
+				else:
+					src = re.split("\s|\.", src)
+					tgt = re.split("\s|,", tgt)
+
+					src = [x for x in src if x and not x.isnumeric()]
+					tgt = [x for x in tgt if x]
+
+					data.append((src, tgt))
+			except:
+				src = re.split("\s|\.", src)
+				tgt = re.split("\s|,", tgt)
+
+				src = [x for x in src if x and not x.isnumeric()]
+				tgt = [x for x in tgt if x]
+
+				data.append((src, tgt))
+
+	with open(f"{output_folder}/commentary.csv", "w", encoding="utf-8") as f:
+		for i in data:
+			f.write(f"{' '.join(i[0])},{' '.join(i[1])}\n")
+
+	print(f"Other language games: {not_en}")
