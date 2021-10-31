@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1igcgpGH1TK_C_18iVbczv5UHEPgg9Ubg
 """
 
-!nvidia-smi
+
 import torch
 torch.cuda.is_available()
 
@@ -17,9 +17,6 @@ import torch.optim as optim
 
 from torchtext.legacy.datasets import Multi30k
 from torchtext.legacy.data import Field, BucketIterator
-
-import spacy
-import numpy as np
 
 import random
 import math
@@ -51,8 +48,8 @@ train_data, val_data, test_data = data.TabularDataset.splits(path='/content/driv
 															 train="train.csv", validation="validate.csv",
 															 test="test.csv", format="csv", fields=[("src", SRC),
 																									("trg", TRG)])
-SRC.build_vocab(train_data.src)
-TRG.build_vocab(train_data.trg)
+SRC.build_vocab(train_data.src, train_data.trg, val_data.src, val_data.trg, test_data.src, test_data.trg)
+TRG.build_vocab(train_data.src, train_data.trg, val_data.src, val_data.trg, test_data.src, test_data.trg)
 
 print(SRC.vocab.itos[0:9])
 print(TRG.vocab.itos[0:9])
