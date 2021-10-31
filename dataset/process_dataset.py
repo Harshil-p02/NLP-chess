@@ -105,13 +105,13 @@ def get_tokens(path):
 
 	return tokens
 
-def make_datasets_nmoves(read_path, write_path, n_moves):
+def make_datasets_nmoves(read_path, write_path, start, end):
 	"""
 	Create csv files to be used for training the model
 	:param read_path: folder to read train, test and validate
 	:param write_path: folder to write output
-	:param n_moves: only first n_moves by each player is used to create the dataset
-	:return:
+	:param start: index for starting move (0 indexed)
+	:param end: index for ending+1 th move
 	"""
 
 	t1 = time.time()
@@ -126,43 +126,44 @@ def make_datasets_nmoves(read_path, write_path, n_moves):
 
 	train_src = []
 	train_tgt = []
-	print(f"grabbing {n_moves} from train tokens...")
+	print(f"grabbing {start}-{end} moves from train tokens...")
 	for game in tqdm(train):
-		if len(game) >= 2*n_moves:
-			train_src.append(' '.join(game[:2 * n_moves - 1]))
-			train_tgt.append(game[2 * n_moves - 1])
+		if len(game) >= 2 * end:
+			train_src.append(' '.join(game[start:2 * end - 1]))
+			train_tgt.append(game[2 * end - 1])
 
-	print(f"writing training data for {n_moves} to file...")
-	os.makedirs(os.path.dirname(rf"{write_path}/{n_moves}/train.csv"), exist_ok=True)
-	with open(rf"{write_path}/{n_moves}/train.csv", "w") as f:
+	# n_moves = end - start
+	print(f"writing training data for {start}-{end} to file...")
+	os.makedirs(os.path.dirname(rf"{write_path}/{start}-{end}/train.csv"), exist_ok=True)
+	with open(rf"{write_path}/{start}-{end}/train.csv", "w") as f:
 		for i in range(len(train_src)):
 			f.write(f"{train_src[i]},{train_tgt[i]}\n")
 
 	test_src = []
 	test_tgt = []
-	print(f"grabbing {n_moves} from test tokens...")
+	print(f"grabbing {start}-{end} from test tokens...")
 	for game in tqdm(test):
-		if len(game) >= 2 * n_moves:
-			test_src.append(' '.join(game[:2 * n_moves - 1]))
-			test_tgt.append(game[2 * n_moves - 1])
+		if len(game) >= 2 * end:
+			test_src.append(' '.join(game[start:2 * end - 1]))
+			test_tgt.append(game[2 * end - 1])
 
-	print(f"writing testing data for {n_moves} to file...")
-	os.makedirs(os.path.dirname(rf"{write_path}/{n_moves}/test.csv"), exist_ok=True)
-	with open(rf"{write_path}/{n_moves}/test.csv", "w") as f:
+	print(f"writing testing data for {start}-{end} to file...")
+	os.makedirs(os.path.dirname(rf"{write_path}/{start}-{end}/test.csv"), exist_ok=True)
+	with open(rf"{write_path}/{start}-{end}/test.csv", "w") as f:
 		for i in range(len(test_src)):
 			f.write(f"{test_src[i]},{test_tgt[i]}\n")
 
 	validate_src = []
 	validate_tgt = []
-	print(f"grabbing {n_moves} from validate tokens...")
+	print(f"grabbing {start}-{end} from validate tokens...")
 	for game in tqdm(validate):
-		if len(game) >= 2 * n_moves:
-			validate_src.append(' '.join(game[:2 * n_moves - 1]))
-			validate_tgt.append(game[2 * n_moves - 1])
+		if len(game) >= 2 * end:
+			validate_src.append(' '.join(game[start:2 * end - 1]))
+			validate_tgt.append(game[2 * end - 1])
 
-	print(f"writing validation data for {n_moves} to file...")
-	os.makedirs(os.path.dirname(rf"{write_path}/{n_moves}/validate.csv"), exist_ok=True)
-	with open(rf"{write_path}/{n_moves}/validate.csv", "w") as f:
+	print(f"writing validation data for {start}-{end} to file...")
+	os.makedirs(os.path.dirname(rf"{write_path}/{start}-{end}/validate.csv"), exist_ok=True)
+	with open(rf"{write_path}/{start}-{end}/validate.csv", "w") as f:
 		for i in range(len(validate_src)):
 			f.write(f"{validate_src[i]},{validate_tgt[i]}\n")
 
