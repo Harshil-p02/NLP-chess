@@ -9,9 +9,6 @@ Original file is located at
 
 
 import torch
-torch.cuda.is_available()
-
-import torch
 import torch.nn as nn
 import torch.optim as optim
 
@@ -22,6 +19,7 @@ import random
 import math
 import time
 
+torch.cuda.is_available()
 SEED = 1234
 
 random.seed(SEED)
@@ -387,7 +385,7 @@ def translate_sentence(sentence, src_field, trg_field, model, device, max_len = 
     
     return trg_tokens[1:]
 
-import random
+
 example_idx = random.randint(0,2000)
 
 input_ = test_data.examples[example_idx].src
