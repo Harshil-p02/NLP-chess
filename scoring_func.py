@@ -7,34 +7,10 @@ import chess
 import re
 from tqdm import tqdm
 
-# e4 c5 2. c3 Nc6 3. d4 cxd4 4. cxd4 e6 5. Nf3 Bb4+ 6. Nc3 d6 7. Bd2 Nge7 8. d5 exd5
+# Example input
 src = ['e4', 'c5', 'c3', 'Nc6', 'd4', 'cxd4', 'cxd4', 'e6', 'Nf3', 'Bb4+', 'Nc3', 'd6', 'Bd2', 'Nge7', 'd5']
-trg = ['Rad8']
+trg = ['exd5']
 res = ['exd5', '<eos>']
-
-
-moves = ''
-i=0
-c = 1
-while i < (len(src))-2:
-    moves += str(c) + '.'
-    for j in range(2):
-        moves += " " + src[i+j]
-    moves += " "
-    c += 1
-    i += 2
-moves += str(c) + ". " + src[-1] + " "
-print(moves)
-
-pgn = open("test.pgn")
-game = chess.pgn.read_game(pgn)
-board1 = chess.Board()
-
-# src has to be a list of whole moves.
-# example: src = ['e4', 'c5', 'c3', 'Nc6', 'd4', 'cxd4', 'cxd4', 'e6', 'Nf3', 'Bb4+', 'Nc3', 'd6', 'Bd2', 'Nge7', 'd5']
-for move in src:
-    board1.push_san(move)
-    # print(board1, end="\n----------------------------------\n")
 
 
 def stockfish14_scores(move_list, prediction):
