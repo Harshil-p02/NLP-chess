@@ -8,10 +8,12 @@ import re
 from tqdm import tqdm
 
 # e4 c5 2. c3 Nc6 3. d4 cxd4 4. cxd4 e6 5. Nf3 Bb4+ 6. Nc3 d6 7. Bd2 Nge7 8. d5 exd5
+'''
+# example data:
 src = ['e4', 'c5', 'c3', 'Nc6', 'd4', 'cxd4', 'cxd4', 'e6', 'Nf3', 'Bb4+', 'Nc3', 'd6', 'Bd2', 'Nge7', 'd5']
 trg = ['Rad8']
 res = ['exd5', '<eos>']
-
+'''
 
 def stockfish14_scores(move_list, prediction):
 
@@ -52,6 +54,6 @@ def stockfish14_scores(move_list, prediction):
     return score
 
 # pred = ['err']
-score = stockfish14_scores(src, res)
+# score = stockfish14_scores(src, res)
 # +ve score --------> stockfish better
 # if score == inf  ------> illelagl move predicted
