@@ -33,7 +33,7 @@ def stockfish14_scores(move_list, prediction):
     # using copy to have two diff boards for evaluation
     eval_board = copy.deepcopy(board_in)
 
-    info = engine.analyse(eval_board, chess.engine.Limit(time=0.1))
+    info = engine.analyse(eval_board, chess.engine.Limit(time=0.1, depth=18))
     score.append(info["score"].white().wdl().expectation())
     # win-draw-lose percentage from white's perspective 
     try:
@@ -42,12 +42,12 @@ def stockfish14_scores(move_list, prediction):
         # print("Illegal move")
         score.append(float('-inf'))
     else:
-        info = engine.analyse(board_in, chess.engine.Limit(time=0.1))
+        info = engine.analyse(board_in, chess.engine.Limit(time=0.1, depth=18))
         score.append(info['score'].white().wdl().expectation())
 
-    result = engine.play(eval_board, chess.engine.Limit(time=0.1))
+    result = engine.play(eval_board, chess.engine.Limit(time=0.1, depth=18))
     eval_board.push(result.move)
-    info = engine.analyse(eval_board, chess.engine.Limit(time=0.1))
+    info = engine.analyse(eval_board, chess.engine.Limit(time=0.1, depth=18))
     score.append(info['score'].white().wdl().expectation())
 
     engine.quit()
